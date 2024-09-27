@@ -445,10 +445,10 @@ function sendData() {
       }
 
       if (redirectUrl) {
-        window.location.href = redirectUrl;
+        window.top.location.href = redirectUrl;
       } else {
         // Default URL if no match found
-        window.location.href = 'https://eczema.iqutis.com';
+        window.top.location.href = 'https://eczema.iqutis.com';
       }
     }
 
