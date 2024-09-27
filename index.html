@@ -11,14 +11,22 @@
     padding: 20px;
   }
 
+  .quiz-intro {
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
   .quiz-question {
     font-size: 18px;
     margin-bottom: 20px;
+    text-align: center;
   }
 
   .quiz-options {
     display: flex;
     flex-direction: column;
+    align-items: center; /* Centering the buttons */
   }
 
   .quiz-button {
@@ -27,7 +35,7 @@
     border: 2px solid black;
     font-size: 16px;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 20px; /* Added padding on left and right */
     margin-bottom: 10px;
     cursor: pointer;
   }
@@ -42,10 +50,11 @@
     text-align: center;
     font-size: 16px;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 20px; /* Added padding on left and right */
     border: none;
     cursor: pointer;
     display: none;
+    margin: 20px auto 0 auto; /* Center the button */
   }
 
   .next-button:disabled {
@@ -74,7 +83,7 @@
     .quiz-button,
     .next-button {
       font-size: 14px;
-      padding: 8px;
+      padding: 8px 16px; /* Adjusted padding for mobile */
     }
 
     .input-field {
@@ -213,9 +222,18 @@
       const questionData = quizData.questions[quizData.currentQuestionIndex];
       quizContainer.innerHTML = '';
 
+      // Add the intro text at the beginning
+      if (quizData.currentQuestionIndex === 0) {
+        const introElement = document.createElement('div');
+        introElement.className = 'quiz-intro';
+        introElement.textContent = 'Answer a few questions and get your first kit for free';
+        quizContainer.appendChild(introElement);
+      }
+
+      // Add the question number and text
       const questionElement = document.createElement('div');
       questionElement.className = 'quiz-question';
-      questionElement.textContent = questionData.question;
+      questionElement.textContent = (quizData.currentQuestionIndex + 1) + '. ' + questionData.question;
 
       quizContainer.appendChild(questionElement);
 
@@ -230,7 +248,7 @@
           button.onclick = function () {
             quizData.answers.push(option);
             // Add points if applicable
-            if (quizData.currentQuestionIndex >= 4) {
+            if (quizData.currentQuestionIndex >= 4 && quizData.currentQuestionIndex <= 12) {
               quizData.totalScore += questionData.points[index];
             }
             quizData.currentQuestionIndex++;
@@ -300,35 +318,36 @@
     }
 
     // Send Data to Google Sheets
-function sendData() {
-  const xhr = new XMLHttpRequest();
-  const corsProxy = 'https://iqutisshopify-11a51c684062.herokuapp.com/'; // CORS proxy URL
-  const url = 'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Google Apps Script URL
+    function sendData() {
+      const xhr = new XMLHttpRequest();
+      const corsProxy = 'https://iqutisshopify-11a51c684062.herokuapp.com/'; // CORS proxy URL
+      const url = 'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Google Apps Script URL
 
-  xhr.open('POST', corsProxy + url, true);  // Send the request via the CORS proxy
-  xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.open('POST', corsProxy + url, true); // Send the request via the CORS proxy
+      xhr.setRequestHeader('Content-Type', 'application/json');
 
-  const date = new Date();
-  const currentDate = date.toISOString().split('T')[0];
-  const currentTime = date.toTimeString().split(' ')[0];
+      const date = new Date();
+      const currentDate = date.toISOString().split('T')[0];
+      const currentTime = date.toTimeString().split(' ')[0];
 
-  const data = {
-    date: currentDate,
-    time: currentTime,
-    utm: quizData.utm,
-    answers: quizData.answers,
-  };
+      const data = {
+        date: currentDate,
+        time: currentTime,
+        utm: quizData.utm,
+        answers: quizData.answers,
+      };
 
-  console.log('Sending data to Google Sheets:', data);
+      console.log('Sending data to Google Sheets:', data);
 
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      console.log('Response from server:', xhr.responseText);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          console.log('Response from server:', xhr.responseText);
+        }
+      };
+
+      xhr.send(JSON.stringify(data));
     }
-  };
 
-  xhr.send(JSON.stringify(data));
-}
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
@@ -455,7 +474,6 @@ function sendData() {
     // Finish Quiz
     function finishQuiz() {
       sendData();
-      debugger;
       redirectToRecommendation();
     }
 
