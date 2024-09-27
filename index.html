@@ -302,7 +302,7 @@
     // Send Data to Google Sheets
 function sendData() {
   const xhr = new XMLHttpRequest();
-  const corsProxy = 'https://cors-anywhere.herokuapp.com/'; // CORS proxy URL
+  const corsProxy = 'https://iqutisshopify.herokuapp.com/'; // CORS proxy URL
   const url = 'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Google Apps Script URL
 
   xhr.open('POST', corsProxy + url, true);  // Send the request via the CORS proxy
