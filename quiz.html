@@ -299,28 +299,36 @@
       quizData.utm = utm;
     }
 
-function sendData() {
-  console.log('sendData() function called');
+    // Send Data to Google Sheets
+    function sendData() {
+      const xhr = new XMLHttpRequest();
+      const url =
+        'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Apps Script URL
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
 
-  const url =
-    'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Apps Script URL
+      const date = new Date();
+      const currentDate = date.toISOString().split('T')[0];
+      const currentTime = date.toTimeString().split(' ')[0];
 
-  const date = new Date();
-  const currentDate = date.toISOString().split('T')[0];
-  const currentTime = date.toTimeString().split(' ')[0];
+      const data = {
+        date: currentDate,
+        time: currentTime,
+        utm: quizData.utm,
+        answers: quizData.answers,
+      };
 
-  const data = {
-    date: currentDate,
-    time: currentTime,
-    utm: quizData.utm,
-    answers: quizData.answers,
-  };
+      console.log('Sending data to Google Sheets:', data);
 
-  const img = new Image();
-  img.src = url + '?data=' + encodeURIComponent(JSON.stringify(data));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          console.log('Response from server:', xhr.responseText);
+        }
+      };
 
-  console.log('Data sent via image beacon:', data);
-}
+      xhr.send(JSON.stringify(data));
+    }
+
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
@@ -446,9 +454,7 @@ function sendData() {
 
     // Finish Quiz
     function finishQuiz() {
-console.log('finishQuiz() function called');
       sendData();
-debugger;
       redirectToRecommendation();
     }
 
@@ -458,3 +464,4 @@ debugger;
   })();
 </script>
 <!-- End Quiz Code -->
+
