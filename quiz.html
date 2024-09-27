@@ -1,0 +1,460 @@
+<!-- Begin Quiz Code -->
+<div id="quiz-container">
+  <!-- Quiz content will be injected here -->
+</div>
+
+<style>
+  /* Quiz Styles */
+  #quiz-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .quiz-question {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quiz-button {
+    background-color: transparent;
+    color: black;
+    border: 2px solid black;
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .quiz-button:hover {
+    background-color: #f0f0f0;
+  }
+
+  .next-button {
+    background-color: #FF5a00;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    display: none;
+  }
+
+  .next-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  .input-field {
+    font-size: 16px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 600px) {
+    #quiz-container {
+      padding: 10px;
+    }
+
+    .quiz-question {
+      font-size: 16px;
+    }
+
+    .quiz-button,
+    .next-button {
+      font-size: 14px;
+      padding: 8px;
+    }
+
+    .input-field {
+      font-size: 14px;
+      padding: 8px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    // Quiz Data
+    const quizData = {
+      currentQuestionIndex: 0,
+      answers: [],
+      totalScore: 0,
+      startTime: new Date(),
+      utm: '',
+      questions: [
+        {
+          question: 'Answer a few questions and get your first kit for free\n\nWho has eczema?',
+          options: ['Me', 'My Child', 'Relative'],
+          type: 'options',
+          points: [0, 0, 0],
+        },
+        {
+          question: 'Has the eczema been diagnosed by a doctor?',
+          options: ['Yes', 'No'],
+          type: 'options',
+          points: [0, 0],
+        },
+        {
+          question: 'What is the gender of the person with eczema?',
+          options: ['Male', 'Female', 'Other'],
+          type: 'options',
+          points: [0, 0, 0],
+        },
+        {
+          question: 'How old is the person with eczema?',
+          placeholder: 'Age',
+          type: 'input',
+          inputType: 'number',
+          validate: function (value) {
+            return value && !isNaN(value);
+          },
+        },
+        {
+          question:
+            'If you have previously used moisturizers for eczema, what did you dislike the most about them?',
+          options: [
+            'I have not used moisturizers before',
+            'They were too greasy, heavy, or sticky',
+            'They were too light and liquid, not moisturizing enough',
+            'They caused irritation or an allergic reaction',
+          ],
+          type: 'options',
+          points: [100, 200, 300, 400],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin been itchy because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many nights has sleep been disturbed because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin been bleeding because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin been weeping or oozing clear fluid because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin been cracked because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin been flaking off because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question:
+            'Over the last week, on how many days has the skin felt dry or rough because of eczema?',
+          options: ['No days', '1-2 days', '3-4 days', '5-6 days', 'Every day'],
+          type: 'options',
+          points: [0, 1, 2, 3, 4],
+        },
+        {
+          question: "What's your name?",
+          placeholder: 'Name',
+          type: 'input',
+          inputType: 'text',
+          validate: function (value) {
+            return value && value.trim() !== '';
+          },
+        },
+        {
+          question:
+            'Almost done!\nEnter your email to receive your personalized eczema care plan',
+          placeholder: 'Email',
+          type: 'input',
+          inputType: 'email',
+          validate: function (value) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(value);
+          },
+          buttonText: 'GET YOUR FREE KIT',
+        },
+      ],
+    };
+
+    // Initialize Quiz
+    const quizContainer = document.getElementById('quiz-container');
+
+    function renderQuestion() {
+      const questionData = quizData.questions[quizData.currentQuestionIndex];
+      quizContainer.innerHTML = '';
+
+      const questionElement = document.createElement('div');
+      questionElement.className = 'quiz-question';
+      questionElement.textContent = questionData.question;
+
+      quizContainer.appendChild(questionElement);
+
+      if (questionData.type === 'options') {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'quiz-options';
+
+        questionData.options.forEach((option, index) => {
+          const button = document.createElement('button');
+          button.className = 'quiz-button';
+          button.textContent = option;
+          button.onclick = function () {
+            quizData.answers.push(option);
+            // Add points if applicable
+            if (quizData.currentQuestionIndex >= 4) {
+              quizData.totalScore += questionData.points[index];
+            }
+            quizData.currentQuestionIndex++;
+            if (quizData.currentQuestionIndex < quizData.questions.length) {
+              renderQuestion();
+            } else {
+              finishQuiz();
+            }
+          };
+          optionsContainer.appendChild(button);
+        });
+
+        quizContainer.appendChild(optionsContainer);
+      } else if (questionData.type === 'input') {
+        const inputField = document.createElement('input');
+        inputField.className = 'input-field';
+        inputField.type = questionData.inputType || 'text';
+        inputField.placeholder = questionData.placeholder;
+
+        const nextButton = document.createElement('button');
+        nextButton.className = 'next-button';
+        nextButton.textContent = questionData.buttonText || 'Next';
+        nextButton.disabled = true;
+        nextButton.style.display = 'block';
+
+        inputField.oninput = function () {
+          if (questionData.validate(inputField.value)) {
+            nextButton.disabled = false;
+          } else {
+            nextButton.disabled = true;
+          }
+        };
+
+        nextButton.onclick = function () {
+          quizData.answers.push(inputField.value);
+          quizData.currentQuestionIndex++;
+          if (quizData.currentQuestionIndex < quizData.questions.length) {
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        };
+
+        quizContainer.appendChild(inputField);
+        quizContainer.appendChild(nextButton);
+      }
+    }
+
+    // Capture UTM Parameters
+    function getUTMParameters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source') || '';
+      const utmMedium = urlParams.get('utm_medium') || '';
+      const utmCampaign = urlParams.get('utm_campaign') || '';
+      const utmTerm = urlParams.get('utm_term') || '';
+      const utmContent = urlParams.get('utm_content') || '';
+
+      const utm = [
+        'utm_source=' + utmSource,
+        'utm_medium=' + utmMedium,
+        'utm_campaign=' + utmCampaign,
+        'utm_term=' + utmTerm,
+        'utm_content=' + utmContent,
+      ].join('&');
+
+      quizData.utm = utm;
+    }
+
+function sendData() {
+  console.log('sendData() function called');
+
+  const url =
+    'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Apps Script URL
+
+  const date = new Date();
+  const currentDate = date.toISOString().split('T')[0];
+  const currentTime = date.toTimeString().split(' ')[0];
+
+  const data = {
+    date: currentDate,
+    time: currentTime,
+    utm: quizData.utm,
+    answers: quizData.answers,
+  };
+
+  const img = new Image();
+  img.src = url + '?data=' + encodeURIComponent(JSON.stringify(data));
+
+  console.log('Data sent via image beacon:', data);
+}
+    // Redirect Based on Score
+    function redirectToRecommendation() {
+      const score = quizData.totalScore;
+      let redirectUrl = '';
+
+      const mappings = [
+        {
+          min: 100,
+          max: 102,
+          url: 'https://eczema.iqutis.com/pages/recommendation-62475?utm_term=62475',
+        },
+        {
+          min: 103,
+          max: 107,
+          url: 'https://eczema.iqutis.com/pages/recommendation-62476?utm_term=62476',
+        },
+        {
+          min: 108,
+          max: 116,
+          url: 'https://eczema.iqutis.com/pages/recommendation-62477?utm_term=62477',
+        },
+        {
+          min: 117,
+          max: 124,
+          url: 'https://eczema.iqutis.com/pages/recommendation-62478?utm_term=62478',
+        },
+        {
+          min: 125,
+          max: 128,
+          url: 'https://eczema.iqutis.com/pages/recommendation-62479?utm_term=62479',
+        },
+        {
+          min: 200,
+          max: 202,
+          url: 'https://eczema.iqutis.com/pages/recommendation-63475?utm_term=63475',
+        },
+        {
+          min: 203,
+          max: 207,
+          url: 'https://eczema.iqutis.com/pages/recommendation-63476?utm_term=63476',
+        },
+        {
+          min: 208,
+          max: 216,
+          url: 'https://eczema.iqutis.com/pages/recommendation-63477?utm_term=63477',
+        },
+        {
+          min: 217,
+          max: 224,
+          url: 'https://eczema.iqutis.com/pages/recommendation-63478?utm_term=63478',
+        },
+        {
+          min: 225,
+          max: 228,
+          url: 'https://eczema.iqutis.com/pages/recommendation-63479?utm_term=63479',
+        },
+        {
+          min: 300,
+          max: 302,
+          url: 'https://eczema.iqutis.com/pages/recommendation-64475?utm_term=64475',
+        },
+        {
+          min: 303,
+          max: 307,
+          url: 'https://eczema.iqutis.com/pages/recommendation-64476?utm_term=64476',
+        },
+        {
+          min: 308,
+          max: 316,
+          url: 'https://eczema.iqutis.com/pages/recommendation-64477?utm_term=64477',
+        },
+        {
+          min: 317,
+          max: 324,
+          url: 'https://eczema.iqutis.com/pages/recommendation-64478?utm_term=64478',
+        },
+        {
+          min: 325,
+          max: 328,
+          url: 'https://eczema.iqutis.com/pages/recommendation-64479?utm_term=64479',
+        },
+        {
+          min: 400,
+          max: 402,
+          url: 'https://eczema.iqutis.com/pages/recommendation-65475?utm_term=65475',
+        },
+        {
+          min: 403,
+          max: 407,
+          url: 'https://eczema.iqutis.com/pages/recommendation-65476?utm_term=65476',
+        },
+        {
+          min: 408,
+          max: 416,
+          url: 'https://eczema.iqutis.com/pages/recommendation-65477?utm_term=65477',
+        },
+        {
+          min: 417,
+          max: 424,
+          url: 'https://eczema.iqutis.com/pages/recommendation-65478?utm_term=65478',
+        },
+        {
+          min: 425,
+          max: 428,
+          url: 'https://eczema.iqutis.com/pages/recommendation-65479?utm_term=65479',
+        },
+      ];
+
+      for (let i = 0; i < mappings.length; i++) {
+        if (score >= mappings[i].min && score <= mappings[i].max) {
+          redirectUrl = mappings[i].url;
+          break;
+        }
+      }
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        // Default URL if no match found
+        window.location.href = 'https://eczema.iqutis.com';
+      }
+    }
+
+    // Finish Quiz
+    function finishQuiz() {
+console.log('finishQuiz() function called');
+      sendData();
+debugger;
+      redirectToRecommendation();
+    }
+
+    // Start Quiz
+    getUTMParameters();
+    renderQuestion();
+  })();
+</script>
+<!-- End Quiz Code -->
