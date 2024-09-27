@@ -300,35 +300,35 @@
     }
 
     // Send Data to Google Sheets
-    function sendData() {
-      const xhr = new XMLHttpRequest();
-      const url =
-        'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Apps Script URL
-      xhr.open('POST', url, true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
+function sendData() {
+  const xhr = new XMLHttpRequest();
+  const corsProxy = 'https://cors-anywhere.herokuapp.com/'; // CORS proxy URL
+  const url = 'https://script.google.com/macros/s/AKfycbxRfth8wKhzp6_JZCqqJug9uUgyMnCF7RXb5xUitpRNj9RN3girLJYmscHxN0evhm71/exec'; // Your Google Apps Script URL
 
-      const date = new Date();
-      const currentDate = date.toISOString().split('T')[0];
-      const currentTime = date.toTimeString().split(' ')[0];
+  xhr.open('POST', corsProxy + url, true);  // Send the request via the CORS proxy
+  xhr.setRequestHeader('Content-Type', 'application/json');
 
-      const data = {
-        date: currentDate,
-        time: currentTime,
-        utm: quizData.utm,
-        answers: quizData.answers,
-      };
+  const date = new Date();
+  const currentDate = date.toISOString().split('T')[0];
+  const currentTime = date.toTimeString().split(' ')[0];
 
-      console.log('Sending data to Google Sheets:', data);
+  const data = {
+    date: currentDate,
+    time: currentTime,
+    utm: quizData.utm,
+    answers: quizData.answers,
+  };
 
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          console.log('Response from server:', xhr.responseText);
-        }
-      };
+  console.log('Sending data to Google Sheets:', data);
 
-      xhr.send(JSON.stringify(data));
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      console.log('Response from server:', xhr.responseText);
     }
+  };
 
+  xhr.send(JSON.stringify(data));
+}
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
