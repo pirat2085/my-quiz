@@ -113,14 +113,20 @@
 <noscript><div><img src="https://mc.yandex.ru/watch/98343685" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 <script>
+  
   (function () {
+    // Generate a unique session ID
+    function generateSessionID() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
     // Quiz Data
     const quizData = {
+      sessionID: generateSessionID(),
       currentQuestionIndex: 0,
       answers: [],
       totalScore: 0,
       startTime: new Date(),
-      utm: '',
+      pageUrl: '',
       questions: [
         {
           question: 'Who has eczema?',
@@ -234,8 +240,45 @@
       ],
     };
 
-    // Initialize Quiz
+// Initialize Quiz
     const quizContainer = document.getElementById('quiz-container');
+
+    // Capture Parent Page URL
+    function getParentPageUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      quizData.pageUrl = urlParams.get('parent_url') || '';
+      console.log("Parent page URL from parameter:", quizData.pageUrl);
+    }
+
+    // Send initial data to Google Sheets to create a new row
+    function startSession() {
+      const xhr = new XMLHttpRequest();
+      const corsProxy = 'https://iqutisshopify-11a51c684062.herokuapp.com/'; // CORS proxy URL
+      const url = 'https://script.google.com/macros/s/AKfycbykomlhljgCsVRVsgFxSeCdmpxPnaD5FouNHal6A6Qf6i_5Op-PA_lsRgvWb3Vzje_u/exec'; // Replace with your Google Apps Script URL
+
+      xhr.open('POST', corsProxy + url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      const date = new Date();
+      const currentDate = date.toISOString().split('T')[0];
+      const currentTime = date.toTimeString().split(' ')[0];
+
+      const data = {
+        newSession: true,
+        sessionID: quizData.sessionID,
+        date: currentDate,
+        time: currentTime,
+        pageUrl: quizData.pageUrl,
+      };
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          console.log('Session started:', xhr.responseText);
+        }
+      };
+
+      xhr.send(JSON.stringify(data));
+    }
 
     function renderQuestion() {
       const questionData = quizData.questions[quizData.currentQuestionIndex];
@@ -252,7 +295,8 @@
       // Add the question number and text
       const questionElement = document.createElement('div');
       questionElement.className = 'quiz-question';
-      questionElement.textContent = (quizData.currentQuestionIndex + 1) + '. ' + questionData.question;
+      questionElement.textContent =
+        quizData.currentQuestionIndex + 1 + '. ' + questionData.question;
 
       quizContainer.appendChild(questionElement);
 
@@ -270,6 +314,7 @@
             if (quizData.currentQuestionIndex >= 4 && quizData.currentQuestionIndex <= 12) {
               quizData.totalScore += questionData.points[index];
             }
+            sendAnswer(option);
             quizData.currentQuestionIndex++;
             if (quizData.currentQuestionIndex < quizData.questions.length) {
               renderQuestion();
@@ -286,6 +331,7 @@
         inputField.className = 'input-field';
         inputField.type = questionData.inputType || 'text';
         inputField.placeholder = questionData.placeholder;
+        inputField.autofocus = true;
 
         const nextButton = document.createElement('button');
         nextButton.className = 'next-button';
@@ -303,6 +349,7 @@
 
         nextButton.onclick = function () {
           quizData.answers.push(inputField.value);
+          sendAnswer(inputField.value);
           quizData.currentQuestionIndex++;
           if (quizData.currentQuestionIndex < quizData.questions.length) {
             renderQuestion();
@@ -313,50 +360,40 @@
 
         quizContainer.appendChild(inputField);
         quizContainer.appendChild(nextButton);
+
+        // Auto-focus the input field
+        inputField.focus();
       }
     }
 
-    // Capture URL Parameters
-  // Capture URL Parameters
-   function getParentPageUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  quizData.utm = urlParams.get('parent_url') || '';
-  console.log("Parent page URL from parameter:", quizData.utm);
-  }
-
-
-
-    // Send Data to Google Sheets
-    function sendData() {
+    // Send Answer to Google Sheets
+    function sendAnswer(answer) {
       const xhr = new XMLHttpRequest();
       const corsProxy = 'https://iqutisshopify-11a51c684062.herokuapp.com/'; // CORS proxy URL
-      const url = 'https://script.google.com/macros/s/AKfycbw6kj6--kKR2p6NRY_-E1nFCs_4gLy7EAK7008c3V1U4gM2_1HCQhX41L3ngTrGlxvSZg/exec'; // Your Google Apps Script URL
+      const url = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
 
-      xhr.open('POST', corsProxy + url, true); // Send the request via the CORS proxy
+      xhr.open('POST', corsProxy + url, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
 
-      const date = new Date();
-      const currentDate = date.toISOString().split('T')[0];
-      const currentTime = date.toTimeString().split(' ')[0];
-
       const data = {
-        date: currentDate,
-        time: currentTime,
-        utm: quizData.utm,
-        answers: quizData.answers,
+        sessionID: quizData.sessionID,
+        questionIndex: quizData.currentQuestionIndex,
+        answer: answer,
       };
-
-      console.log('Sending data to Google Sheets:', data);
 
       xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          console.log('Response from server:', xhr.responseText);
+          console.log('Answer sent:', xhr.responseText);
         }
       };
 
       xhr.send(JSON.stringify(data));
     }
-
+    // Finish Quiz
+    function finishQuiz() {
+      // Optionally, you can send final data or perform any cleanup
+      redirectToRecommendation();
+    }
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
@@ -480,15 +517,10 @@
       }
     }
 
-    // Finish Quiz
-    function finishQuiz() {
-      sendData();
-      debugger;
-      redirectToRecommendation();
-    }
-
-    // Start Quiz
-    getParentPageUrl(); 
+   
+     // Start Quiz
+    getParentPageUrl();
+    startSession();
     renderQuestion();
   })();
 </script>
