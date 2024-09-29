@@ -320,10 +320,12 @@
     function getParentPageUrl() {
   try {
     quizData.pageUrl = window.top.location.href;
+    console.log("Parent page URL:", quizData.pageUrl); // Логируем для проверки
   } catch (error) {
     console.error("Unable to access parent page URL:", error);
   }
 }
+
 
 
     // Send Data to Google Sheets
@@ -483,6 +485,7 @@
     // Finish Quiz
     function finishQuiz() {
       sendData();
+      debugger;
       redirectToRecommendation();
     }
 
