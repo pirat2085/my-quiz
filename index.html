@@ -120,7 +120,7 @@
       answers: [],
       totalScore: 0,
       startTime: new Date(),
-      pageUrl: '',
+      utm: '',
       questions: [
         {
           question: 'Who has eczema?',
@@ -319,8 +319,8 @@
     // Capture URL Parameters
    function getParentPageUrl() {
   const urlParams = new URLSearchParams(window.location.search);
-  quizData.pageUrl = urlParams.get('parent_url') || '';
-  console.log("Parent page URL from parameter:", quizData.pageUrl);
+  quizData.utm = urlParams.get('parent_url') || '';
+  console.log("Parent page URL from parameter:", quizData.utm);
   }
 
 
@@ -341,7 +341,7 @@
       const data = {
         date: currentDate,
         time: currentTime,
-        pageUrl: quizData.pageUrl,
+        urm: quizData.utm,
         answers: quizData.answers,
       };
 
