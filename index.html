@@ -317,14 +317,11 @@
     }
 
     // Capture URL Parameters
-    function getParentPageUrl() {
-  try {
-    quizData.pageUrl = window.top.location.href;
-    console.log("Parent page URL:", quizData.pageUrl); // Логируем для проверки
-  } catch (error) {
-    console.error("Unable to access parent page URL:", error);
+   function getParentPageUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  quizData.pageUrl = urlParams.get('parent_url') || '';
+  console.log("Parent page URL from parameter:", quizData.pageUrl);
   }
-}
 
 
 
