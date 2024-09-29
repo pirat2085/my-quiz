@@ -317,11 +317,13 @@
     }
 
     // Capture URL Parameters
-   function getParentPageUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  quizData.utm = urlParams.get('parent_url') || '';
-  console.log("Parent page URL from parameter:", quizData.utm);
+  function getParentPageUrl() {
+  try {
+    quizData.utm = window.top.location.href;
+  } catch (error) {
+    console.error("Unable to access parent page URL:", error);
   }
+}
 
 
 
