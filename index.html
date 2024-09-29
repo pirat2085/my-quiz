@@ -120,7 +120,7 @@
       answers: [],
       totalScore: 0,
       startTime: new Date(),
-      utm: '',
+      pageUrl: '',
       questions: [
         {
           question: 'Who has eczema?',
@@ -316,25 +316,15 @@
       }
     }
 
-    // Capture UTM Parameters
-    function getUTMParameters() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const utmSource = urlParams.get('utm_source') || '';
-      const utmMedium = urlParams.get('utm_medium') || '';
-      const utmCampaign = urlParams.get('utm_campaign') || '';
-      const utmTerm = urlParams.get('utm_term') || '';
-      const utmContent = urlParams.get('utm_content') || '';
+    // Capture URL Parameters
+    function getParentPageUrl() {
+  try {
+    quizData.pageUrl = window.top.location.href;
+  } catch (error) {
+    console.error("Unable to access parent page URL:", error);
+  }
+}
 
-      const utm = [
-        'utm_source=' + utmSource,
-        'utm_medium=' + utmMedium,
-        'utm_campaign=' + utmCampaign,
-        'utm_term=' + utmTerm,
-        'utm_content=' + utmContent,
-      ].join('&');
-
-      quizData.utm = utm;
-    }
 
     // Send Data to Google Sheets
     function sendData() {
@@ -352,7 +342,7 @@
       const data = {
         date: currentDate,
         time: currentTime,
-        utm: quizData.utm,
+        pageUrl: quizData.pageUrl,
         answers: quizData.answers,
       };
 
@@ -497,7 +487,7 @@
     }
 
     // Start Quiz
-    getUTMParameters();
+    getParentPageUrl(); 
     renderQuestion();
   })();
 </script>
