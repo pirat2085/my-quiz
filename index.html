@@ -370,7 +370,7 @@
     function sendAnswer(answer) {
       const xhr = new XMLHttpRequest();
       const corsProxy = 'https://iqutisshopify-11a51c684062.herokuapp.com/'; // CORS proxy URL
-      const url = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
+      const url = 'https://script.google.com/macros/s/AKfycbykomlhljgCsVRVsgFxSeCdmpxPnaD5FouNHal6A6Qf6i_5Op-PA_lsRgvWb3Vzje_u/exec'; // Replace with your Google Apps Script URL
 
       xhr.open('POST', corsProxy + url, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
