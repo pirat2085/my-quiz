@@ -299,7 +299,7 @@
           button.onclick = function () {
             quizData.answers.push(option);
             // Add points if applicable
-            if (quizData.currentQuestionIndex >= 4 && quizData.currentQuestionIndex <= 12) {
+            if (quizData.currentQuestionIndex >= 2 && quizData.currentQuestionIndex <= 12) {
               quizData.totalScore += questionData.points[index];
             }
             sendAnswer(option);
