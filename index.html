@@ -235,7 +235,7 @@
     function getParentPageUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       quizData.pageUrl = urlParams.get('parent_url') || '';
-      console.log("Parent page URL from parameter:", quizData.pageUrl);
+      
     }
 
     // Send initial data to Google Sheets to create a new row
@@ -301,7 +301,7 @@
             // Add points if applicable
             if (quizData.currentQuestionIndex >= 2 && quizData.currentQuestionIndex <= 12) {
               quizData.totalScore += questionData.points[index];
-              console.log('Added points:', questionData.points[index], 'Total Score:', quizData.totalScore);
+              
             }
 
             sendAnswer(option);
@@ -382,16 +382,14 @@
     // Finish Quiz
     function finishQuiz() {
   // Optionally, you can send final data or perform any cleanup
-  console.log('Finishing Quiz. Total Score:', quizData.totalScore);
-      debugger;
+  
+      
   redirectToRecommendation();
 }
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
       let redirectUrl = '';
-console.log('Redirecting based on score:', score);
-      debugger;
       const mappings = [
         {
           min: 100,
@@ -501,9 +499,7 @@ console.log('Redirecting based on score:', score);
           break;
         }
       }
-console.log('Redirecting to URL:', redirectUrl);
-      debugger;
-      if (redirectUrl) {
+     if (redirectUrl) {
         window.top.location.href = redirectUrl;
       } else {
         // Default URL if no match found
