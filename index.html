@@ -237,7 +237,10 @@
       quizData.pageUrl = urlParams.get('parent_url') || '';
       
     }
-
+    // Add this function to get the user's timezone
+    function getUserTimezone() {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
     // Send initial data to Google Sheets to create a new row
     function startSession() {
       const xhr = new XMLHttpRequest();
@@ -250,6 +253,7 @@
       const date = new Date();
       const currentDate = date.toISOString().split('T')[0];
       const currentTime = date.toTimeString().split(' ')[0];
+      const userTimezone = getUserTimezone();
 
       const data = {
         newSession: true,
@@ -257,6 +261,7 @@
         date: currentDate,
         time: currentTime,
         pageUrl: quizData.pageUrl,
+        userTimezone: userTimezone,
       };
 
       xhr.onreadystatechange = function () {
