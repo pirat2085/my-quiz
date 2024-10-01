@@ -379,14 +379,17 @@
     }
     // Finish Quiz
     function finishQuiz() {
-      // Optionally, you can send final data or perform any cleanup
-      redirectToRecommendation();
-    }
+  // Optionally, you can send final data or perform any cleanup
+  console.log('Finishing Quiz. Total Score:', quizData.totalScore);
+      debugger;
+  redirectToRecommendation();
+}
     // Redirect Based on Score
     function redirectToRecommendation() {
       const score = quizData.totalScore;
       let redirectUrl = '';
-
+console.log('Redirecting based on score:', score);
+      debugger;
       const mappings = [
         {
           min: 100,
@@ -496,7 +499,8 @@
           break;
         }
       }
-
+console.log('Redirecting to URL:', redirectUrl);
+      debugger;
       if (redirectUrl) {
         window.top.location.href = redirectUrl;
       } else {
